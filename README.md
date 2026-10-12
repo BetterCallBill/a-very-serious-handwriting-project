@@ -1,6 +1,19 @@
 # Event Booking & Ticketing Platform
 
-## 1. Current progress according to the 8-week plan
+## Current progress
+
+Last updated: 12 October 2026 (Australia/Sydney).
+
+- **Current stage:** Week 1 fundamentals; fourth recorded learning session.
+- **Completed:** CRUD actions, request DTO, shared request validation, validation before mutation. Review on 12 October found no new defects in the validator extraction or service lookup methods. Local HTTP checks passed the complete CRUD sequence, trimming, ID preservation, 14 invalid POST/PUT requests, unchanged storage after rejected updates, and missing-resource PUT/DELETE responses.
+- **Current exercise:** `EventService.GetAll` and `GetById`, with two sample events, passed source review; direct service runtime checks have not been run. The service is not yet registered or used by the controller. The API builds with zero errors and one NU1903 warning for transitive `Microsoft.OpenApi` 2.0.0; previous zero-warning records are historical.
+- **Working preference:** Implement ordinary requested work with minimal manual coding. Review-only requests preserve executable code and provide commented corrections for findings; passing reviews remove comments from reviewed source files.
+- **Understanding demonstrated:** See the historical record below. No new assessment scores have been awarded; implementation and build success alone do not establish independent understanding.
+- **Knowledge gaps / pending checks:** Dependency injection and service lifetimes remain unassessed. Shared in-memory storage is not yet safe for concurrent access; the HTTP checks were sequential. Review the OpenAPI dependency warning before introducing untrusted document parsing (see [advisory](https://github.com/advisories/GHSA-v5pm-xwqc-g5wc)); no such input path was found in this API.
+- **Next action:** Migrate the remaining service operations and introduce constructor injection with a deliberate storage lifetime. Keep all endpoints on one store during integration. Review collection copies versus shared event references before relying on storage encapsulation.
+- **Unresolved question:** What happens to instance-owned events if a new service instance is created for every request?
+
+## Historical progress snapshot — 9 October 2026
 
 Last updated: 9 October 2026 (Australia/Sydney).
 
@@ -42,12 +55,17 @@ Current stage: **Week 1 — C# and ASP.NET Core fundamentals, in progress.** Thi
 
 Collection creation, object initializer syntax, properties versus fields, method calls, routing, and response helpers have required guided examples. Continue practising these without copying a complete solution. Static lifetime and readonly are understood at an introductory level and need further application. Full dependency injection, async programming, and request-lifecycle understanding remain unassessed.
 
-**Next action:** GET the actual Location URL from the successful POST while the same application process is running. Then begin input validation.
+**Next action at that time:** GET the actual Location URL from the successful POST while the same application process is running. Then begin input validation.
 
 ## Study diary / 学习日记
 
-Study notes have moved to [DIARY.md](DIARY.md), grouped by week and day in English and Simplified Chinese.
+Each daily file in [Diary/](Diary/) uses interview questions followed by reference answers, preserving English and Chinese explanations and code examples. Historical session records are kept separate from the answers.
 
-学习笔记已移至 [DIARY.md](DIARY.md)，按周和天整理，提供英文和简体中文两个版本。
+学习笔记按天保存在 [Diary 文件夹](Diary/) 中，采用“面试问题 → 参考答案”格式，保留中英文解释和代码示例；历史进度记录单独列出。
 
-The progress snapshot above was recorded on 9 October. The eight-week schedule was superseded by the agreed four-week plan on 10 October; see Week 1, Day 3 in the diary.
+- [Week 1 — Day 1 / 第 1 周 — 第 1 天 — 2026-10-08](Diary/2026-10-08.md)
+- [Week 1 — Day 2 / 第 1 周 — 第 2 天 — 2026-10-09](Diary/2026-10-09.md)
+- [Week 1 — Day 3 / 第 1 周 — 第 3 天 — 2026-10-10](Diary/2026-10-10.md)
+- [Week 1 — Day 4 / 第 1 周 — 第 4 天 — 2026-10-12](Diary/2026-10-12.md)
+
+The progress snapshot above was recorded on 9 October. The eight-week schedule was superseded by the agreed four-week plan on 10 October; see [Week 1, Day 3](Diary/2026-10-10.md).
