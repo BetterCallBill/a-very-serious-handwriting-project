@@ -2,16 +2,32 @@
 
 ## Current progress
 
-Last updated: 13 October 2026 (Australia/Sydney). See [status.md](status.md) for the current task and working agreement.
+Last updated: 15 October 2026 (Australia/Sydney). See [status.md](status.md) for the current task and working agreement.
 
-- **Current stage:** Week 1 fundamentals; fourth recorded learning session.
-- **Completed:** CRUD actions, request DTO, shared request validation, validation before mutation. Review on 12 October found no new defects in the validator extraction or service lookup methods. Local HTTP checks passed the complete CRUD sequence, trimming, ID preservation, 14 invalid POST/PUT requests, unchanged storage after rejected updates, and missing-resource PUT/DELETE responses.
-- **Current exercise:** `EventService.Delete`, `Create`, and `Update` passed review and direct runtime checks on 13 October. Update passed 50 assertions, including missing IDs, 11 invalid cases, supplied time, trimming, ID preservation, and unchanged storage after rejected updates. The service is not yet registered or used by the controller. The previous API build reported one NU1903 warning for transitive `Microsoft.OpenApi` 2.0.0.
-- **Working preference:** After a review passes, update `status.md` and add a diary entry. Provide templates and routine boilerplate; the learner writes the key lines and logic with guidance. This preference was explicitly corrected on 13 October and supersedes the earlier automatic implementation workflow.
-- **Understanding demonstrated:** The learner correctly explained why repeated deletion returns false and implemented the corresponding lookup, null guard, and removal. No broader assessment scores were awarded.
-- **Knowledge gaps / pending checks:** Dependency injection and service lifetimes remain unassessed. Shared in-memory storage is not yet safe for concurrent access; the HTTP checks were sequential. Review the OpenAPI dependency warning before introducing untrusted document parsing (see [advisory](https://github.com/advisories/GHSA-v5pm-xwqc-g5wc)); no such input path was found in this API.
-- **Next action:** Learn constructor injection and choose a service lifetime for instance-owned in-memory storage. Then integrate all controller actions with one service store and verify HTTP behavior. Concurrent access and shared mutable event references still need attention before treating this as reliable storage.
-- **Unresolved question:** What happens to instance-owned events if a new service instance is created for every request?
+- **Current stage:** Week 1 fundamentals; session of 15 October, continuing service extraction.
+- **Completed:** Every controller action now uses constructor-injected `EventService`. The existing singleton registration preserves one store across requests. Controller-owned storage and duplicate validation/mapping were removed. Service access uses a lock, and all returned events are copies so callers cannot mutate storage.
+- **Verification:** API build passed with zero errors and the existing NU1903 warning for transitive `Microsoft.OpenApi` 2.0.0. The repeatable HTTP script passed 46 checks, including CRUD, following Location, invalid input, unchanged storage after rejection, missing resources, concurrent creates, coherent concurrent reads/updates, and exactly one successful concurrent deletion. A temporary console harness passed 14 direct service checks, including returned-object isolation and explicit validation time.
+- **Working preference:** Follow the current AGENTS.md: complete requested implementation and verification; independent exercises only when explicitly requested or accepted. Older template-only notes are historical.
+- **Understanding demonstrated:** Previously explained repeated deletion correctly. Today's code was assistant-implemented; DI, service lifetimes, locking, and snapshots remain unassessed. No new scores awarded.
+- **Known limitations:** In-memory changes disappear on restart and are not shared between API processes. Locking serializes store access and does not detect stale client updates; the latest successful update wins. No authentication yet. The existing OpenAPI dependency warning remains ([advisory](https://github.com/advisories/GHSA-v5pm-xwqc-g5wc)); dependency remediation is a follow-up.
+- **Next action:** Trace a POST through routing, model binding, controller activation, service validation, and response serialization. Explain singleton versus scoped lifetime before moving on to middleware and async/await within Week 1.
+- **Optional understanding check:** If `AddSingleton<EventService>()` became `AddScoped<EventService>()`, would a GET in a later request find an event created by POST? Explain using `_events`.
+
+## Run and verify locally
+
+Start a disposable local API process:
+
+```sh
+dotnet run --project EventBooking.Api --launch-profile http
+```
+
+In a second terminal:
+
+```sh
+python3 scripts/verify-events.py http://localhost:5016
+```
+
+The script creates and cleans up its own events and sends concurrent requests. Run it against a local development instance with no other writers. It requires Python 3.9+ and no external Python packages. Build with `dotnet build EventBooking.Api`.
 
 ## Historical progress snapshot — 9 October 2026
 
@@ -71,6 +87,8 @@ Each daily file in [Diary/](Diary/) uses interview questions followed by referen
 - [Week 1 — Day 2 / 第 1 周 — 第 2 天 — 2026-10-09](Diary/2026-10-09.md)
 - [Week 1 — Day 3 / 第 1 周 — 第 3 天 — 2026-10-10](Diary/2026-10-10.md)
 - [Week 1 — Day 4 / 第 1 周 — 第 4 天 — 2026-10-11](Diary/2026-10-11.md)
-- [Workflow correction and deletion exercise / 学习流程调整与删除练习 — 2026-10-13](Diary/2026-10-13.md)
+- [Constructor injection and shared storage / 构造函数注入与共享存储 — 2026-10-15](Diary/2026-10-15.md)
+- [Service CRUD and validation — interview Q&A / 服务 CRUD 与验证面试问答 — 2026-10-13](Diary/2026-10-13.md)
+- [Git obj cleanup — interview Q&A / Git obj 清理面试问答 — 2026-10-14](Diary/2026-10-14.md)
 
-The progress snapshot above was recorded on 9 October. The eight-week schedule was superseded by the agreed four-week plan on 10 October; see [Week 1, Day 3](Diary/2026-10-10.md).
+The snapshot above was recorded on 9 October. A historical four-week plan appears in [Week 1, Day 3](Diary/2026-10-10.md); the current instructions specify the eight-week roadmap. We remain in Week 1 until foundational understanding is demonstrated.

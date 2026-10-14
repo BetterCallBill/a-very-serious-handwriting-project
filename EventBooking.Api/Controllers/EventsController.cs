@@ -1,6 +1,6 @@
 using EventBooking.Api.Contracts;
+using EventBooking.Api.Services;
 using Microsoft.AspNetCore.Mvc;
-using EventBooking.Api.Validation;
 
 namespace EventBooking.Api.Controllers;
 
@@ -8,104 +8,73 @@ namespace EventBooking.Api.Controllers;
 [Route("[controller]")]
 public class EventsController : ControllerBase
 {
-    private static readonly List<Event> Events =
-    [
-        new Event {
-            Id = Guid.NewGuid(),
-            Title = "aaa",
-            StartTime = DateTime.Now,
-            Location = "syd",
-            Capacity = 10
-        },
-        new Event {
-            Id = Guid.NewGuid(),
-            Title = "bbb",
-            StartTime = DateTime.Now,
-            Location = "syd",
-            Capacity = 99
-        }
-    ];
+    private readonly EventService _eventService;
+
+    public EventsController(EventService eventService)
+    {
+        _eventService = eventService;
+    }
 
     [HttpGet(Name = "Get Events")]
     public IEnumerable<Event> Get()
     {
-        return Events;
+        return _eventService.GetAll();
     }
 
     [HttpGet("{id}", Name = "Get Event")]
     public ActionResult<Event> GetEventById(Guid id)
     {
-        var result = Events.FirstOrDefault(x => x.Id == id);
+        var result = _eventService.GetById(id);
 
-        if (result != null)
-            return result;
+        if (result is null)
+        {
+            return NotFound();
+        }
 
-        return NotFound();
+        return Ok(result);
     }
 
     [HttpPost(Name = "Create Event")]
     public ActionResult<Event> Post([FromBody] EventRequest request)
     {
-        var validate = EventRequestValidator.Validate(request, DateTimeOffset.Now);
+        var (createdEvent, error) = _eventService.Create(request, DateTimeOffset.UtcNow);
 
-        if (validate != null)
+        if (error is not null)
         {
-            return BadRequest(new { Error = validate});
+            return BadRequest(new { Error = error });
         }
-
-        var newEvent = new Event
-        {
-            Id = Guid.NewGuid(),
-            Title = request.Title!.Trim(),
-            Location = request.Location!.Trim(),
-            StartTime = request.StartTime,
-            Capacity = request.Capacity
-        };
-
-        Events.Add(newEvent);
 
         return CreatedAtAction(
             nameof(GetEventById),
-            new { id = newEvent.Id },
-            newEvent);
+            new { id = createdEvent!.Id },
+            createdEvent);
     }
 
     [HttpPut("{id:guid}")]
     public ActionResult<Event> UpdateEvent(Guid id, [FromBody] EventRequest request)
     {
-        var existingEvent = Events.FirstOrDefault(x => x.Id == id);
+        var (updatedEvent, error) = _eventService.Update(id, request, DateTimeOffset.UtcNow);
 
-        if (existingEvent is null)
+        if (error is not null)
+        {
+            return BadRequest(new { Error = error });
+        }
+
+        if (updatedEvent is null)
         {
             return NotFound();
         }
 
-        var error = EventRequestValidator.Validate(request, DateTimeOffset.Now);
-
-        if (error is not null)
-        {
-            return BadRequest(new { Error = error});
-        }
-
-        existingEvent.Title = request.Title!.Trim();
-        existingEvent.Location = request.Location!.Trim();
-        existingEvent.StartTime = request.StartTime;
-        existingEvent.Capacity = request.Capacity;
-
-        return Ok(existingEvent);
+        return Ok(updatedEvent);
     }
 
     [HttpDelete("{id:guid}")]
     public IActionResult DeleteEvent(Guid id)
     {
-        var existingEvent = Events.FirstOrDefault(e => e.Id == id);
-
-        if (existingEvent is null)
+        if (!_eventService.Delete(id))
         {
             return NotFound();
         }
-
-        Events.Remove(existingEvent);
 
         return NoContent();
     }

@@ -1,42 +1,44 @@
 # Learning status
 
-Last updated: 13 October 2026 (Australia/Sydney).
+Last updated: 15 October 2026 (Australia/Sydney).
 
 ## Working agreement
 
-The user's instruction on 13 October supersedes the earlier automatic implementation preference for learning tasks:
+Follow the current AGENTS.md and instructions supplied for this session:
 
-- After a review passes, update this file and add a dated entry under `Diary/`.
-- Generate scaffolding, signatures, and routine boilerplate only. Leave the important logic and key lines for the learner to write.
-- Explain the objective, inputs, outputs, and acceptance criteria. Guide with questions and hints, then wait for the learner's implementation.
-- Review the implementation before advancing. Preserve executable code during review; use REVIEW comments with suggested corrections according to the existing review rules.
-- Do not complete the key implementation unless the learner explicitly asks for the solution.
+- Complete requested implementation, configuration, and verification; minimize manual coding.
+- Use independent exercises and hint-only teaching only when explicitly requested or accepted.
+- Keep README.md, DIARY.md, this status file, and dated learning notes current.
+- For review-only requests, preserve executable code and follow the REVIEW-comment rules.
+- Do not award assessment points for assistant-generated code or advance beyond Week 1 without evidence of foundational understanding.
+
+The template-only agreement recorded on 13 October is historical and superseded by the current instructions. Its session record remains in [Diary/2026-10-13.md](Diary/2026-10-13.md). The current roadmap is eight weeks.
 
 ## Current progress
 
 - **Current week:** Week 1 — C# and ASP.NET Core fundamentals.
-- **Current day:** 13 October; continuation of the service extraction task.
-- **Completed:** Controller CRUD, request DTO, shared validation, and service `GetAll` / `GetById` passed the previous review. Learner-written `Delete(Guid id)` passed source review and runtime checks on 13 October; completed TODO comments were removed without changing executable logic.
-- **Verification already recorded:** Earlier API build succeeded with one NU1903 dependency warning, and sequential HTTP CRUD checks passed. A temporary console harness compiled the actual service and verified existing, missing, repeated, and empty-store deletions, lookup/list consistency, and preservation of the other event's fields. No concurrency checks or new HTTP integration checks were performed during the Delete review.
-- **Reverted:** Assistant-written service CRUD, locking, copies, dependency injection, clock injection, and test/solution scaffolding from the interrupted continuation. These are not learner achievements.
-- **Current coding challenge:** `EventService.Update` is complete and passed review for sequential service behavior. Next is constructor injection and selecting a lifetime that preserves instance-owned events across requests. The controller still uses its original store.
-- **Concepts understood:** The learner correctly explained that a second deletion returns false because the lookup finds no event, and implemented lookup, a null guard, and a boolean removal result. This supports the specific deletion concept, not a broad claim of C# mastery.
-- **Knowledge gaps:** Service versus controller responsibilities, DI lifetimes, shared references, and concurrent storage access remain to be assessed.
-- **Technical assessment scores:** Unchanged; no points awarded for assistant-generated code.
-- **Unresolved questions:** Why must every update field be validated before modifying the stored event? How will all endpoints share the same store after integration?
-- **Known limitations:** The original shared list remains unsafe under concurrency. `GetAll` copies the collection but shares its event objects. The existing OpenAPI dependency warning remains.
-- **Latest review:** `Update` passed source review and a temporary console harness compiling the actual source. All 50 assertions passed: missing-ID precedence, 11 invalid cases with unchanged storage and request data, supplied historical time, trimmed/mapped fields, stable ID/count, retrieval/list consistency, unchanged other events, repeated updates, rejection after success, and an empty store. Removed completed template comments without changing executable logic. No HTTP integration, concurrency checks, or full API build were run in this review. Independent explanation remains unassessed; scores are unchanged.
-- **Next action:** Explain what happens if each request receives a new `EventService`, then prepare the controller-integration exercise. Integrate every endpoint with the same store and verify create-followed-by-GET, update, deletion, and error responses; address shared storage safety as part of integration.
+- **Current day:** Session of 15 October; service integration completed.
+- **Completed tasks:** Existing CRUD, request DTO, validation, and service methods are now connected to every controller action through constructor injection. The existing singleton registration is used. One private lock protects service storage; all returned events are copies and GetAll materializes its snapshot inside the lock.
+- **Current coding challenge:** Integration is complete. Next focus is the HTTP request lifecycle and the distinction between service lifetime, synchronization, and object references.
+- **Concepts understood:** Earlier evidence supports the learner's explanation that repeated deletion returns false because the event no longer exists. Today's implementation and test results provide no new independent-understanding evidence.
+- **Knowledge gaps:** DI lifetimes, controller/service responsibilities, snapshots and locks, middleware, exception handling, and async/await still need explanation and assessment.
+- **Technical assessment scores:** Unchanged; no new scores awarded. Other roadmap areas remain unassessed as previously recorded.
+- **Unresolved questions:** Why does per-request service creation lose instance-owned events between requests? Why are both locking and copies needed? What happens between receiving JSON and returning the response?
+- **Known limitations:** Data disappears on restart and is private to one application process. Store operations serialize behind a lock. Stale client updates are last-write-wins. Authentication, persistence, and booking capacity rules are not implemented. Existing OpenAPI dependency warning remains a follow-up.
+- **Next action:** Trace POST through routing, model binding, controller activation/injection, service validation, and serialization; continue middleware and async/await within Week 1. Optional recall question: would a later GET find a POST-created event if registration changed from singleton to scoped?
 
-## Update acceptance criteria — passed
+## Verification — 15 October
 
-1. A missing ID returns `(null, null)` without changing storage, even when the request is invalid; this preserves the controller's existing lookup-first behavior.
-2. An existing event with invalid input returns `(null, error)` and retains all original values; reuse the validator with the supplied `now`.
-3. Success returns `(updatedEvent, null)`, preserves its ID, trims title/location, and applies the requested start time/capacity.
-4. GetById/GetAll reflect the update; event count and other events remain unchanged. Return no HTTP results from the service.
+- API build succeeded with zero errors and one existing NU1903 warning for transitive Microsoft.OpenApi 2.0.0.
+- Repeatable `scripts/verify-events.py` passed 46 HTTP checks covering CRUD, following Location, field trimming, ID preservation, invalid POST/PUT requests, unchanged storage after rejection, missing-resource precedence, 40 parallel creates, 60 concurrent update/read sequences, and 12 competing deletes with exactly one success.
+- A temporary console harness compiled the actual service source and passed 14 direct checks for explicit validation time, equal-time rejection, independent returned objects from every method, validation-before-mutation, missing-ID precedence, materialized list snapshots, and empty-store behavior.
+- Build output was directed to `/tmp` to avoid altering tracked bin files. The temporary HTTP server was stopped after testing.
+- These checks provide regression evidence for the exercised cases; they do not constitute a load test or proof of distributed concurrency safety.
 
-## Latest diary
+## Previous evidence and maintenance
 
-Repository maintenance (14 October): removed 36 tracked `obj` files from the index and all local `main` commits; preserved local files and uncommitted work. Committed `.gitignore` as `d5f295c`. GitHub history remains unchanged pending a decision about force-pushing; recovery refs and remote-tracking refs retain old history. Existing tracked `bin` files were not part of the requested cleanup. The current learning topic remains dependency injection and service lifetimes.
+The learner's Delete, Create, and Update methods passed sequential review on 13 October. Create passed 29 direct assertions; Update passed 50. See [13 October notes](Diary/2026-10-13.md) for review findings, corrections, and learning evidence.
 
-[13 October — Delete/Create/Update reviews and DI next step](Diary/2026-10-13.md)
+Repository maintenance (14 October): removed 36 tracked obj files from the index and local main history, preserving local files. Existing tracked bin files and GitHub history were outside that cleanup. See [maintenance notes](Diary/2026-10-14.md).
+
+Latest learning notes: [15 October — Constructor injection and shared storage](Diary/2026-10-15.md).
