@@ -1,0 +1,48 @@
+# .NET build and publish outputs
+[Bb]in/
+[Oo]bj/
+[Aa]rtifacts/
+
+# Visual Studio and Rider local state
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.sln.iml
+_ReSharper*/
+*.DotSettings.user
+
+# Test results and coverage reports
+[Tt]est[Rr]esults/
+coverage/
+coverage-report/
+*.coverage
+*.coveragexml
+coverage.cobertura.xml
+coverage.opencover.xml
+
+# NuGet package outputs and legacy package restore directory
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+
+# Local environment settings and publish credentials
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pubxml.user
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+
+# Operating system files
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
