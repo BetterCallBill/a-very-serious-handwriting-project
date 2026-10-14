@@ -2,15 +2,15 @@
 
 ## Current progress
 
-Last updated: 12 October 2026 (Australia/Sydney).
+Last updated: 13 October 2026 (Australia/Sydney). See [status.md](status.md) for the current task and working agreement.
 
 - **Current stage:** Week 1 fundamentals; fourth recorded learning session.
 - **Completed:** CRUD actions, request DTO, shared request validation, validation before mutation. Review on 12 October found no new defects in the validator extraction or service lookup methods. Local HTTP checks passed the complete CRUD sequence, trimming, ID preservation, 14 invalid POST/PUT requests, unchanged storage after rejected updates, and missing-resource PUT/DELETE responses.
-- **Current exercise:** `EventService.GetAll` and `GetById`, with two sample events, passed source review; direct service runtime checks have not been run. The service is not yet registered or used by the controller. The API builds with zero errors and one NU1903 warning for transitive `Microsoft.OpenApi` 2.0.0; previous zero-warning records are historical.
-- **Working preference:** Implement ordinary requested work with minimal manual coding. Review-only requests preserve executable code and provide commented corrections for findings; passing reviews remove comments from reviewed source files.
-- **Understanding demonstrated:** See the historical record below. No new assessment scores have been awarded; implementation and build success alone do not establish independent understanding.
+- **Current exercise:** `EventService.Delete`, `Create`, and `Update` passed review and direct runtime checks on 13 October. Update passed 50 assertions, including missing IDs, 11 invalid cases, supplied time, trimming, ID preservation, and unchanged storage after rejected updates. The service is not yet registered or used by the controller. The previous API build reported one NU1903 warning for transitive `Microsoft.OpenApi` 2.0.0.
+- **Working preference:** After a review passes, update `status.md` and add a diary entry. Provide templates and routine boilerplate; the learner writes the key lines and logic with guidance. This preference was explicitly corrected on 13 October and supersedes the earlier automatic implementation workflow.
+- **Understanding demonstrated:** The learner correctly explained why repeated deletion returns false and implemented the corresponding lookup, null guard, and removal. No broader assessment scores were awarded.
 - **Knowledge gaps / pending checks:** Dependency injection and service lifetimes remain unassessed. Shared in-memory storage is not yet safe for concurrent access; the HTTP checks were sequential. Review the OpenAPI dependency warning before introducing untrusted document parsing (see [advisory](https://github.com/advisories/GHSA-v5pm-xwqc-g5wc)); no such input path was found in this API.
-- **Next action:** Migrate the remaining service operations and introduce constructor injection with a deliberate storage lifetime. Keep all endpoints on one store during integration. Review collection copies versus shared event references before relying on storage encapsulation.
+- **Next action:** Learn constructor injection and choose a service lifetime for instance-owned in-memory storage. Then integrate all controller actions with one service store and verify HTTP behavior. Concurrent access and shared mutable event references still need attention before treating this as reliable storage.
 - **Unresolved question:** What happens to instance-owned events if a new service instance is created for every request?
 
 ## Historical progress snapshot — 9 October 2026
@@ -59,13 +59,18 @@ Collection creation, object initializer syntax, properties versus fields, method
 
 ## Study diary / 学习日记
 
+Repository hygiene (14 October): removed all 36 tracked `obj` files from the index and local `main` history, preserving local build files and uncommitted work. The existing `.gitignore` is now committed and excludes future `obj` files. GitHub history has not been rewritten; remote-tracking refs and recovery references still retain the old history. Existing tracked `bin` files were outside this cleanup's scope.
+
 Each daily file in [Diary/](Diary/) uses interview questions followed by reference answers, preserving English and Chinese explanations and code examples. Historical session records are kept separate from the answers.
+
+[DIARY.md](DIARY.md) indexes the current learning notes and next understanding check.
 
 学习笔记按天保存在 [Diary 文件夹](Diary/) 中，采用“面试问题 → 参考答案”格式，保留中英文解释和代码示例；历史进度记录单独列出。
 
 - [Week 1 — Day 1 / 第 1 周 — 第 1 天 — 2026-10-08](Diary/2026-10-08.md)
 - [Week 1 — Day 2 / 第 1 周 — 第 2 天 — 2026-10-09](Diary/2026-10-09.md)
 - [Week 1 — Day 3 / 第 1 周 — 第 3 天 — 2026-10-10](Diary/2026-10-10.md)
-- [Week 1 — Day 4 / 第 1 周 — 第 4 天 — 2026-10-12](Diary/2026-10-12.md)
+- [Week 1 — Day 4 / 第 1 周 — 第 4 天 — 2026-10-11](Diary/2026-10-11.md)
+- [Workflow correction and deletion exercise / 学习流程调整与删除练习 — 2026-10-13](Diary/2026-10-13.md)
 
 The progress snapshot above was recorded on 9 October. The eight-week schedule was superseded by the agreed four-week plan on 10 October; see [Week 1, Day 3](Diary/2026-10-10.md).
